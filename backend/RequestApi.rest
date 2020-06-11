@@ -1,3 +1,6 @@
 
 ## REST API Client for VSCODE (https://github.com/Huachao/vscode-restclient)
-POST http://localhost:5000/api/login
+//POST http://localhost:5000/api/login
+
+#user routes
+POST http://localhost:5000/api/users

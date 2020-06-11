@@ -17,19 +17,23 @@ class authController {
 
     //get new access token with refresh token
     refreshToken = (req, res) => {
-        const refreshToken = req.body.token
+        try {
+            const refreshToken = req.body.token
 
-        if (refreshToken == null) return res.sendStatus(401);
+            if (refreshToken == null) return res.sendStatus(401);
 
-        if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
+            if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
 
-        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-            if (err) return res.sendStatus(403)
+            jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+                if (err) return res.sendStatus(403)
 
-            const accessToken = this.generateAccessToken({ name: user.name })
+                const accessToken = this.generateAccessToken({ name: user.name })
 
-            res.json({ accessToken: accessToken })
-        });
+                res.json({ accessToken: accessToken })
+            });
+        } catch (e) {
+            res.sendStatus(500);
+        }
     };
 
     //delete token refresh token and access token
@@ -42,7 +46,7 @@ class authController {
     //login to get access token and refresh token
     login = (req, res) => {
         // Authenticate User
-        //try {
+        try {
             const username = req.body.username
             const user = { name: username }
 
@@ -52,9 +56,9 @@ class authController {
             this.appCache.set(this.refreshTokenCache, refreshToken);
 
             res.json({ accessToken: accessToken, refreshToken: refreshToken });
-        /* } catch (e) {
+        } catch (e) {
             res.sendStatus(500);
-        } */
+        } 
     };
 
     //generate new access token
