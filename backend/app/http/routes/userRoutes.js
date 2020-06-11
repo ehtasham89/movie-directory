@@ -8,7 +8,7 @@ var routes = function(user){
 
     //login route
     userRouter.route('/')
-        .get(userController.register);
+        .post(userController.register);
 
     return userRouter;
 };

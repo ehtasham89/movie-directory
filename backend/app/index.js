@@ -1,11 +1,16 @@
+//middlewares
+var jwtVerified = require('./http/middleware/jwt');
+
+//all routes
 var authRouter = require('./http/routes/authRutes');
 var userRouter = require('./http/routes/userRoutes');
-var jwtVerified = require('./http/middleware/jwt');
+var movieRouter = require('./http/routes/movieRoutes');
 
 //app init
 var init = function(app, port) {
     var auth = {};
     var user = {};
+    var movie = {};
 
     //default route
      app.get('/', (req, res) => {
@@ -18,7 +23,8 @@ var init = function(app, port) {
     //========= Protected Routes =========\\
     //user routes
     app.use('/api/users', jwtVerified, userRouter(user));
-   
+    //movie routes
+    app.use('/api/movies', movieRouter(movie));
 }
 
 module.exports = init;
