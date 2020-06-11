@@ -27,6 +27,7 @@
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.21.1",
     "mysql2": "^2.1.0",
+    "node-cache": "^5.1.1",
     "sequelize": "^5.21.12"
   },
   "devDependencies": {
