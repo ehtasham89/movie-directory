@@ -3,12 +3,11 @@ var express = require('express');
 var routes = function(movie){
     var movieRouter = express.Router();
     
-    var movieController = require('./../controller/movieController');
+    var movieController = require('./../controllers/movieController');
         movieController = new movieController(movie); //pass movie model to movie controller
 
-    //login route
-    movieRouter.route('/')
-        .get(movieController.register);
+    //register new user
+    movieRouter.get('/', movieController.register);
 
     return movieRouter;
 };

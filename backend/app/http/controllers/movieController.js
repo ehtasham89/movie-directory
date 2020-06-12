@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 
 class authController {
     /*
-     * movie authentication controller with JSON Web Token
+     * movie controller
     */
     constructor(movie) {
         this.movieModel = movie;

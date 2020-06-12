@@ -3,20 +3,17 @@ var express = require('express');
 var routes = function(auth){
     var authRouter = express.Router();
     
-    var authController = require('./../controller/authController');
+    var authController = require('./../controllers/authController');
         authController = new authController(auth); //pass auth model to auth controller
 
     //login route
-    authRouter.route('/')
-        .post(authController.login);
+    authRouter.post('/login', authController.login);
         
     //get refresh route
-    authRouter.route('/refresh-token')
-        .get(authController.logout);
+    authRouter.post('/refresh-token', authController.refreshToken);
 
     //logout route
-    authRouter.route('/logout')
-        .get(authController.logout);
+    authRouter.get('/logout', authController.logout);
 
     return authRouter;
 };

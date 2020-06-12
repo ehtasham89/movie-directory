@@ -1,15 +1,17 @@
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+
 const cache = require( "./../../services/cache.js" );
 
 class authController {
     /*
      * user authentication controller with JSON Web Token
     */
-    constructor(auth) {
-        this.authModel = auth;
+    constructor(users) {
+        this.users = users;
         this.appCache = new cache(process.env.CACHE_TIME || 3600);
         this.refreshTokenCache = "jwtRefreshTokens";
-        this.tokenExpiry = '15s';
+        this.tokenExpiry = '1800s';
 
         //refresh token for retrive access token
         this.refreshTokens = [this.appCache.get(this.refreshTokenCache)];
@@ -27,7 +29,7 @@ class authController {
             jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
                 if (err) return res.sendStatus(403)
 
-                const accessToken = this.generateAccessToken({ name: user.name })
+                const accessToken = this.generateAccessToken(user)
 
                 res.json({ accessToken: accessToken })
             });
@@ -48,16 +50,35 @@ class authController {
         // Authenticate User
         try {
             const username = req.body.username
-            const user = { name: username }
 
-            const accessToken = this.generateAccessToken(user)
-            const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET)
+            this.users.findOne({ where: { username: username } }).then(data => {
+                if (data && data.username && req.body.password && data.password) {
+                    const user = {username: data.username, email: data.email};
+
+                    bcrypt.compare(req.body.password, data.password, (err, bcryptRes) => {
+                        if (!bcryptRes) {
+                            res.status(400).send('password does not match, try again');
+                        } else {
+                            const accessToken = this.generateAccessToken(user);
+                            const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET);
+                            
+                            this.appCache.set(this.refreshTokenCache, refreshToken);
             
-            this.appCache.set(this.refreshTokenCache, refreshToken);
-
-            res.json({ accessToken: accessToken, refreshToken: refreshToken });
+                            res.json({ accessToken: accessToken, refreshToken: refreshToken , user});
+                        }
+                    });
+                } else {
+                    res.status(400).send('Cannot find user')
+                }
+            }).catch(err => {
+                res.status(400).send({
+                    message: err.message || "Some error occurred while retriving user data."
+                });
+            });
         } catch (e) {
-            res.sendStatus(500);
+            res.status(500).send({
+                message: e.message || "Some error occurred while login user."
+            });
         } 
     };
 
